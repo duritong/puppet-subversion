@@ -19,22 +19,9 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-# modules_dir { \"subversion\": }
-
 class subversion {
     case $operatingsystem {
         debian,ubuntu: { include subversion::debian }
         default: { include subversion::base }
-    }
-}
-
-class subversion::base {
-    package{'subversion':
-        ensure => present,
-    }
-}
-class subversion::debian inherits subversion::base {
-    package {'subversion-tools': 
-        ensure => present;
     }
 }
