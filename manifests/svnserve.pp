@@ -28,25 +28,25 @@
 #       password => "mypassword"
 #   }
 define svnserve($source, $path, $user = false, $password = false) {
-    file { $path:
-        ensure => directory,
-        owner => root,
-        group => root
-    }
-    $svncmd = $user ? {
-        false => "/usr/bin/svn co --non-interactive $source/$name .",
-        default => "/usr/bin/svn co --non-interactive --username $user --password '$password' $source/$name ."
-    }   
-    exec { "svnco-$name":
-        command => $svncmd,
-        cwd => $path,
-        require => [ File[$path], Package['subversion'] ],
-        creates => "$path/.svn"
-    }
-    exec { "svnupdate-$name":
-        command => "/usr/bin/svn update",
-        require => [ Exec["svnco-$name"], Package['subversion'] ],
-        onlyif => '/usr/bin/svn status -u --non-interactive | /bin/grep "\*"',
-        cwd => $path
-    }
+  file { $path:
+    ensure => directory,
+    owner => root,
+    group => root
+  }
+  $svncmd = $user ? {
+    false => "/usr/bin/svn co --non-interactive ${source}/${name} .",
+    default => "/usr/bin/svn co --non-interactive --username ${user} --password '${password}' ${source}/${name} ."
+  }   
+  exec { "svnco-${name}":
+    command => $svncmd,
+    cwd => $path,
+    require => [ File[$path], Package['subversion'] ],
+    creates => "${path}/.svn"
+  }
+  exec { "svnupdate-${name}":
+    command => "/usr/bin/svn update",
+    require => [ Exec["svnco-${name}"], Package['subversion'] ],
+    onlyif => '/usr/bin/svn status -u --non-interactive | /bin/grep "\*"',
+    cwd => $path
+  }
 }

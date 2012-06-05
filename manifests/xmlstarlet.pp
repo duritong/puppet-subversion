@@ -1,9 +1,9 @@
 # manifests/xmlstarlet.pp
 
 class subversion::xmlstarlet {
-    include subversion
+  include subversion
 
-    package{'xmlstarlet': 
-        ensure => present,
-    }
+  package{'xmlstarlet': 
+    ensure => present,
+  }
 }

@@ -1,5 +1,5 @@
 class subversion::base {
-    package{'subversion':
-        ensure => present,
-    }
+  package{'subversion':
+    ensure => present,
+  }
 }

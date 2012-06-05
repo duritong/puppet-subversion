@@ -17,54 +17,54 @@
 
 # Create a new subversion repository.
 define subversion::svnrepo(
-    $path='absent',
-    $owner='false',
-    $group='false',
-    $mode='false'
+  $path='absent',
+  $owner='false',
+  $group='false',
+  $mode='false'
 ) {
-    include subversion
+  include subversion
 
-    case $path {
-        absent: {
-            include subversion::basics
-            $create_path = "/srv/svn/${name}"
-        }
-        default: { $create_path = "${path}/${name}" }
+  case $path {
+    absent: {
+      include subversion::basics
+      $create_path = "/srv/svn/${name}"
     }
-    exec { "create-svn-$name":
-        command => "/usr/bin/svnadmin create $create_path",
-        creates => "$create_path",
-        before => File["${create_path}"],
+    default: { $create_path = "${path}/${name}" }
+  }
+  exec { "create-svn-${name}":
+    command => "/usr/bin/svnadmin create ${create_path}",
+    creates => "$create_path",
+    before => File[$create_path],
+  }
+  case $path {
+    absent: { 
+      Exec["create-svn-${name}"]{
+        require +> [ Package['subversion'], File['/srv/svn'] ],
+      }
     }
-    case $path {
-        absent: { 
-            Exec["create-svn-$name"]{
-                require +> [ Package['subversion'], File['/srv/svn'] ],
-            }
-        }
-        default: {
-            Exec["create-svn-$name"]{
-                require +> Package['subversion'],
-            }
-        }
+    default: {
+      Exec["create-svn-${name}"]{
+        require +> Package['subversion'],
+      }
     }
-    file{"${create_path}":
-        ensure => directory,
-        recurse => true,
+  }
+  file{$create_path:
+    ensure => directory,
+    recurse => true,
+  }
+  if $owner {
+    File[$create_path]{
+      owner => $owner,
     }
-    if $owner {
-        File["${create_path}"]{
-            owner => $owner,
-        }
-    } 
-    if $group {
-        File["${create_path}"]{
-            group => $group,
-        }
-    } 
-    if $mode {
-        File["${create_path}"]{
-            mode => $mode,
-        }
-    } 
+  } 
+  if $group {
+    File[$create_path]{
+      group => $group,
+    }
+  } 
+  if $mode {
+    File[$create_path]{
+      mode => $mode,
+    }
+  } 
 }
