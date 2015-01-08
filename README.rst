@@ -75,6 +75,8 @@ The subversion module provides a ``subversion`` class and a
     that puppet defaults are used.
   - ``$mode``: The mode of the repository directory. Default is to false, which means
     that puppet defaults are used.
+  - ``$selinux_context``: The selinux context of the repository directory, this only 
+    applies if selinux is enabled.  Default is false which means no context is set.
 
   Example::
 
