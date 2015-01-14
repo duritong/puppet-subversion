@@ -72,7 +72,8 @@ define subversion::svnrepo(
   if $selinux_context and str2bool($::selinux) {
     exec {"set_${name}_repo_selinux_context":
       command     => "semanage fcontext -a -t ${selinux_context} \"${$create_path}(/.*)?\" && restorecon -R -v ${$create_path}",
-      require     => File[$create_path],
+      subscribe   => File[$create_path],
+      refreshonly => true
     }
   }
 }
