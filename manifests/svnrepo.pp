@@ -20,7 +20,8 @@ define subversion::svnrepo(
   $path='absent',
   $owner='false',
   $group='false',
-  $mode='false'
+  $mode='false',
+  $selinux_context='false'
 ) {
   include subversion
 
@@ -66,5 +67,13 @@ define subversion::svnrepo(
     File[$create_path]{
       mode => $mode,
     }
-  } 
+  }
+  # if selinux is enabled and there is a required context apply it
+  if $selinux_context and str2bool($::selinux) {
+    exec {"set_${name}_repo_selinux_context":
+      command     => "semanage fcontext -a -t ${selinux_context} \"${$create_path}(/.*)?\" && restorecon -R -v ${$create_path}",
+      subscribe   => File[$create_path],
+      refreshonly => true
+    }
+  }
 }
