@@ -4,6 +4,6 @@
 class subversion::basics {
   file{'/srv/svn':
     ensure => directory,
-    owner => root, group => 0, mode => 0755;
+    owner => root, group => 0, mode => '0755';
   }
 }
