@@ -17,28 +17,28 @@
 
 # Create a new subversion repository.
 define subversion::svnrepo(
-  $path='absent',
-  $owner='false',
-  $group='false',
-  $mode='false',
-  $selinux_context='false'
+  $path             = 'absent',
+  $owner            = undef,
+  $group            = undef,
+  $mode             = undef,
+  $selinux_context  = undef,
 ) {
-  include subversion
+  include ::subversion
 
   case $path {
-    absent: {
-      include subversion::basics
+    'absent': {
+      include ::subversion::basics
       $create_path = "/srv/svn/${name}"
     }
     default: { $create_path = "${path}/${name}" }
   }
   exec { "create-svn-${name}":
     command => "/usr/bin/svnadmin create ${create_path}",
-    creates => "$create_path",
-    before => File[$create_path],
+    creates => $create_path,
+    before  => File[$create_path],
   }
   case $path {
-    absent: { 
+    'absent': {
       Exec["create-svn-${name}"]{
         require +> [ Package['subversion'], File['/srv/svn'] ],
       }
@@ -50,19 +50,19 @@ define subversion::svnrepo(
     }
   }
   file{$create_path:
-    ensure => directory,
+    ensure  => directory,
     recurse => true,
   }
   if $owner {
     File[$create_path]{
       owner => $owner,
     }
-  } 
+  }
   if $group {
     File[$create_path]{
       group => $group,
     }
-  } 
+  }
   if $mode {
     File[$create_path]{
       mode => $mode,
@@ -73,7 +73,7 @@ define subversion::svnrepo(
     exec {"set_${name}_repo_selinux_context":
       command     => "semanage fcontext -a -t ${selinux_context} \"${$create_path}(/.*)?\" && restorecon -R -v ${$create_path}",
       subscribe   => File[$create_path],
-      refreshonly => true
+      refreshonly => true,
     }
   }
 }

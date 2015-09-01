@@ -21,32 +21,37 @@
 # date, especially useful for providing data to your Puppet server.
 #
 # Example usage:
-#   svnserve { dist:
+#   subversion::svnserve { dist:
 #       source => "https://reductivelabs.com/svn",
 #       path => "/dist",
 #       user => "puppet",
 #       password => "mypassword"
 #   }
-define svnserve($source, $path, $user = false, $password = false) {
-  file { $path:
+define subversion::svnserve(
+  $source,
+  $path,
+  $user = false,
+  $password = false
+) {
+  file {$path:
     ensure => directory,
-    owner => root,
-    group => root
+    owner  => root,
+    group  => root,
   }
   $svncmd = $user ? {
-    false => "/usr/bin/svn co --non-interactive ${source}/${name} .",
+    false   => "/usr/bin/svn co --non-interactive ${source}/${name} .",
     default => "/usr/bin/svn co --non-interactive --username ${user} --password '${password}' ${source}/${name} ."
-  }   
+  }
   exec { "svnco-${name}":
     command => $svncmd,
-    cwd => $path,
+    cwd     => $path,
     require => [ File[$path], Package['subversion'] ],
-    creates => "${path}/.svn"
+    creates => "${path}/.svn",
   }
   exec { "svnupdate-${name}":
-    command => "/usr/bin/svn update",
+    command => '/usr/bin/svn update',
     require => [ Exec["svnco-${name}"], Package['subversion'] ],
-    onlyif => '/usr/bin/svn status -u --non-interactive | /bin/grep "\*"',
-    cwd => $path
+    onlyif  => '/usr/bin/svn status -u --non-interactive | /bin/grep "\*"',
+    cwd     => $path,
   }
 }

@@ -19,9 +19,10 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
+# Manage basic things of subversion
 class subversion {
   case $::operatingsystem {
-    debian,ubuntu: { include subversion::debian }
-    default: { include subversion::base }
+    'Debian','Ubuntu': { include ::subversion::debian }
+    default: { include ::subversion::base }
   }
 }
